@@ -3,6 +3,6 @@
 **/.DS_Store
 
 # Docker Secrets, Environment Files
-**/.env
+**/.env*
 **/cf_api_token.txt
 **/cloudflare-acme.json
