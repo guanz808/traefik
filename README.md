@@ -36,7 +36,7 @@ age -d cf_api_token.txt-encrtpted  > cf_api_token.txt
 
 # Deploy
 ### deploy_traefik_compose.sh
-git clone https://github.com/guanz808/traefik_compose.git
+git clone https://github.com/guanz808/traefik.git
 This script does the following:
 * clones the traefik_compose GitHub repository to the local computer  
 * decrypts the .env-encrypted and cf_api_token.txt-encrtpted files  
@@ -44,7 +44,7 @@ This script does the following:
 
 deploy_traefik_compose.sh 
 ```
-wget -O - https://raw.githubusercontent.com/guanz808/traefik_compose/main/deploy.sh | bash
+wget -O - https://raw.githubusercontent.com/guanz808/traefik/main/deploy.sh | bash
 ```
 
 To pull for changes from GitHub and redeploy run the following command:  
