@@ -8,7 +8,7 @@ reset='\033[0m'
 # Variables
 CONTAINER_NAME="traefik"
 DOCKER_COMPOSE_DIR="$HOME/docker/traefik"
-GITHUB_REPO="https://github.com/guanz808/traefik_compose.git"
+GITHUB_REPO="https://github.com/guanz808/traefik.git"
 
 ###################################################################################
 ## Clone the Github repository
