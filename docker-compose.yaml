@@ -1,0 +1,53 @@
+# docker-compose.yml
+services:
+  traefik:
+    image: traefik:v3.6.7
+    container_name: traefik
+    ports:
+      - 80:80
+      - 443:443
+      - 8080:8080 
+    environment:
+
+      TRAEFIK_DASHBOARD_CREDENTIALS: ${TRAEFIK_DASHBOARD_CREDENTIALS}
+      CF_API_EMAIL: ${CF_API_EMAIL}
+      DOMAIN: ${DOMAIN}
+    # CF_DNS_API_TOKEN will be loaded from the Docker secret file below (the secret file is kept at /run/secrets/cf_api_token inside the container)  
+    secrets:
+      - cf_api_token      
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./config/traefik.yml:/etc/traefik/traefik.yml:ro 
+      - ./data/certs/:/var/traefik/certs:rw
+      - ./config/config.yml:/config.yml:ro       
+    networks:
+      - frontend
+    restart: unless-stopped
+
+    # Load Cloudflare API token from secret file into environment, then start Traefik
+    command: sh -c "export CF_DNS_API_TOKEN=$(cat /run/secrets/cf_api_token) && traefik"
+
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.traefik.entrypoints=web"
+      - "traefik.http.routers.traefik.rule=Host(`traefik.${DOMAIN}`)"
+      - "traefik.http.middlewares.traefik-auth.basicauth.users=${TRAEFIK_DASHBOARD_CREDENTIALS}"
+      - "traefik.http.middlewares.traefik-https-redirect.redirectscheme.scheme=https"
+      - "traefik.http.middlewares.sslheader.headers.customrequestheaders.X-Forwarded-Proto=https"
+      - "traefik.http.routers.traefik.middlewares=traefik-https-redirect"
+      - "traefik.http.routers.traefik-secure.entrypoints=websecure"
+      - "traefik.http.routers.traefik-secure.rule=Host(`traefik.${DOMAIN}`)"
+      - "traefik.http.routers.traefik-secure.middlewares=traefik-auth,sslheader"
+      - "traefik.http.routers.traefik-secure.tls=true"
+      - "traefik.http.routers.traefik-secure.tls.certresolver=cloudflare"
+      - "traefik.http.routers.traefik-secure.tls.domains[0].main=${DOMAIN}"
+      - "traefik.http.routers.traefik-secure.tls.domains[0].sans=*.${DOMAIN}"
+      - "traefik.http.routers.traefik-secure.service=api@internal"
+
+secrets:
+  cf_api_token:
+    file: ./cf_api_token.txt         
+networks:
+  frontend:
+    external: true
+ 

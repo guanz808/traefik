@@ -1,0 +1,90 @@
+http:
+ #region routers 
+  routers:
+#    synas:
+#      entryPoints:
+#        - "websecure"
+#      rule: "Host(`synas.dajays.com`)"
+#      middlewares:
+#        - default-headers
+#        - https-redirectscheme
+#      tls: {}
+#      service: synas
+#    photos:
+#      entryPoints:
+#        - "websecure"
+#      rule: "Host(`photos.dajays.com`)"
+#      middlewares:
+#        - default-headers
+#        - https-redirectscheme
+#      tls: {}
+#      service: photos
+#    drive:
+#      entryPoints:
+#        - "websecure"
+#      rule: "Host(`drive.dajays.com`)"
+#      middlewares:
+#        - default-headers
+#        - https-redirectscheme
+#      tls: {}
+#      service: drive      
+    hubitat:
+      entryPoints:
+        - "websecure"
+      rule: "Host(`hubitat.dajays.com`)"
+      middlewares:
+        - default-headers
+        - https-redirectscheme
+      tls: {}
+      service: hubitat           
+#endregion
+#region services
+  services:
+#    synas:
+#      loadBalancer:
+#        servers:
+#          - url: "https://10.69.5.11:5001/"
+#        passHostHeader: true 
+#    photos:
+#      loadBalancer:
+#        servers:
+#          - url: "https://10.69.5.11:5443/"
+#        passHostHeader: true 
+#    drive:
+#      loadBalancer:
+#        servers:
+#          - url: "https://10.69.5.11:1003/"
+#        passHostHeader: true         
+    hubitat:
+      loadBalancer:
+        servers:
+          - url: "https://10.69.3.22/"
+        passHostHeader: true                     
+#endregion
+  middlewares:
+    https-redirectscheme:
+      redirectScheme:
+        scheme: https
+        permanent: true
+    default-headers:
+      headers:
+        frameDeny: true
+        browserXssFilter: true
+        contentTypeNosniff: true
+        forceSTSHeader: true
+        stsIncludeSubdomains: true
+        stsPreload: true
+        stsSeconds: 15552000
+        customFrameOptionsValue: SAMEORIGIN
+        customRequestHeaders:
+          X-Forwarded-Proto: https
+    default-whitelist:
+      ipAllowList:
+        sourceRange:
+        - "10.69.0.0/16"
+
+    secured:
+      chain:
+        middlewares:
+        - default-whitelist
+        - default-headers
